@@ -1,0 +1,43 @@
+{
+    "defaults": [
+        "members_gid1",
+        "users_gid2"
+    ],
+    "mappings": {
+        "everyone_gid3": [
+            [
+                "*",
+                "*"
+            ]
+        ],
+        "chairs_gid4": [
+            [
+                "chair",
+                "*"
+            ]
+        ],
+        "ietf_gid5": [
+            [
+                "*",
+                "ietf"
+            ]
+        ],
+        "ietf-chairs_gid6": [
+            [
+                "chair",
+                "ietf"
+            ]
+        ],
+        "void_gid98": [],
+        "generic_gid99": [
+            [
+                "role1",
+                "group1"
+            ],
+            [
+                "role2",
+                "group2"
+            ]
+        ]
+    }
+}

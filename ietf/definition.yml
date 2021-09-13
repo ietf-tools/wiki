@@ -1,0 +1,69 @@
+key: ietf
+title: IETF datatracker OpenID Connect
+description: Authenticate users through IETF datatracker OpenID Connect
+author: Meetecho
+logo: https://www.ietf.org/static/img/ietf-logo.dc9646b3c716.svg
+color: blue lighten-1
+website: https://datatracker.ietf.org/
+isAvailable: true
+useForm: false
+props:
+  clientId:
+    type: String
+    title: 'Client ID'
+    hint: 'Application Client ID'
+    order: 1
+  clientSecret:
+    type: String
+    title: 'Client Secret'
+    hint: 'Application Client Secret'
+    order: 2
+  issuer:
+    type: String
+    title: 'Issuer'
+    hint: 'Issuer URL'
+    default: 'https://auth.ietf.org/api/openid'
+    order: 3
+  authorizationURL:
+    type: String
+    title: 'Authorization Endpoint URL'
+    hint: 'Application Authorization Endpoint URL'
+    default: 'https://auth.ietf.org/api/openid/authorize'
+    order: 4
+  tokenURL:
+    type: String
+    title: 'Token Endpoint URL'
+    hint: 'Application Token Endpoint URL'
+    default: 'https://auth.ietf.org/api/openid/token'
+    order: 5
+  userInfoURL:
+    type: String
+    title: 'User Info Endpoint URL'
+    hint: 'User Info Endpoint URL'
+    default: 'https://auth.ietf.org/api/openid/userinfo'
+    order: 6
+  logoutURL:
+    type: String
+    title: 'Logout URL'
+    hint: '(optional) Logout URL on the OAuth2 provider where the user will be redirected to complete the logout process'
+    default: 'https://auth.ietf.org/api/openid/end-session'
+    order: 7
+  scope:
+    type: String
+    title: 'Scopes'
+    hint: 'User scopes to request'
+    default: 'openid profile email photo roles'
+    order: 8
+  emailClaim:
+    type: String
+    title: 'Email Claim'
+    hint: 'Field containing the email address'
+    default: 'email'
+    maxWidth: 500
+    order: 9
+  rolesClaim:
+    type: String
+    title: 'Roles Claim'
+    hint: 'Field containing the roles array'
+    default: 'roles'
+    order: 10

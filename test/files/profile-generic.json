@@ -1,0 +1,24 @@
+{
+    "_json": {
+        "email": "john@doe.org",
+        "family_name": "Doe",
+        "given_name": "John",
+        "name": "John Doe",
+        "nickname": "-",
+        "picture": "https://www.ietf.org/cdn-cgi/image/fit=scale-down,width=80,height=80/media/photo/John_Doe_001_oifyeNP.jpg",
+        "roles": [
+            [
+                "role2",
+                "group2"
+            ]
+        ],
+        "sub": "1234"
+    },
+    "_raw": "{\"sub\": \"1575\", \"name\": \"John Doe\", \"given_name\": \"John\", \"family_name\": \"Doe\", \"nickname\": \"-\", \"picture\": \"https://www.ietf.org/cdn-cgi/image/fit=scale-down,width=80,height=80/media/photo/John_Doe_001_oifyeNP.jpg\", \"email\": \"john@doe.org\", \"roles\": [[\"role2\", \"group2\"]]}",
+    "displayName": "John Doe",
+    "id": "1234",
+    "name": {
+        "familyName": "Doe",
+        "givenName": "John"
+    }
+}
