@@ -9,7 +9,10 @@ const OpenIDConnectStrategy = require('passport-openidconnect').Strategy;
 const context = {
   groupMappings: {
     defaults: [],
-    mappings: {},
+    mappings: {
+      roles: {},
+      dots: {},
+    },
   },
   lastModified: -1,
 };
@@ -19,7 +22,7 @@ const mappingsFilePath = join(__dirname, 'mappings.json');
 module.exports = {
   init(passport, conf) {
     WIKI.logger.debug(`[ietf-auth] current conf -> ${JSON.stringify(conf)}`);
-    const { authorizationURL, callbackURL, clientId: clientID, clientSecret, emailClaim, issuer, rolesClaim, scope, tokenURL, userInfoURL } = conf;
+    const { authorizationURL, callbackURL, clientId: clientID, clientSecret, emailClaim, issuer, rolesClaim, dotsClaim, scope, tokenURL, userInfoURL } = conf;
     importJsonMappings({ context, path: mappingsFilePath, force: true });
     WIKI.logger.debug(`[ietf-auth] current mappings -> ${JSON.stringify(context.groupMappings)}`);
     passport.use(
@@ -45,7 +48,7 @@ module.exports = {
           });
           WIKI.logger.debug(`[ietf-auth] user profile -> ${JSON.stringify(profile)}`);
           importJsonMappings({ context, path: mappingsFilePath, force: false });
-          const ietfUserGroups = await matchUserRoles({ context, profile, rolesClaim });
+          const ietfUserGroups = await matchUserRoles({ context, profile, rolesClaim, dotsClaim });
           await WIKI.models.users.updateUser({
             id: user.id,
             groups: ietfUserGroups,
@@ -110,46 +113,72 @@ async function getGroupsByName(name) {
 
 /* Return an array of Wiki.js group IDs, by mapping the datatracker */
 /* roles to the Wiki.js groups, according to the mappings JSON */
-async function matchUserRoles({ context, profile, rolesClaim }) {
+async function matchUserRoles({ context, profile, rolesClaim, dotsClaim }) {
   const userRoles = _.get(profile, '_json.' + rolesClaim);
   WIKI.logger.debug(`[ietf-auth] user roles -> ${JSON.stringify(userRoles)}`);
   if (!Array.isArray(userRoles)) throw new Error(`user profile is missing "${rolesClaim}" scope`);
-  const userWikiGroups = [];
+
+  const userDots = _.get(profile, '_json.' + dotsClaim);
+  WIKI.logger.debug(`[ietf-auth] user dots -> ${JSON.stringify(userDots)}`);
+  if (!Array.isArray(userDots)) throw new Error(`user profile is missing "${dotsClaim}" scope`);
+
+  /* Use Set to avoid duplicates */
+  const userWikiGroupIds = new Set();
+  const userWikiGroupNames = new Set();
+
 
   /* Add defaults groups */
   for (const wikiGroupName of context.groupMappings.defaults) {
+    /* Do not add duplicate group names */
+    if (userWikiGroupNames.has(wikiGroupName)) continue;
+    userWikiGroupNames.add(wikiGroupName);
     /* Add the user to all group ids matching the name wikiGroupName */
     for (const { id: groupId } of await getGroupsByName(wikiGroupName)) {
-      /* Do not add duplicate group ids */
-      if (userWikiGroups.includes(groupId)) continue;
       WIKI.logger.info(`[ietf-auth] adding user "${profile.displayName}" to default group "${wikiGroupName}" (id=${groupId})`);
-      userWikiGroups.push(groupId);
+      userWikiGroupIds.add(groupId);
     }
   }
 
   /* Check group mappings */
-  for (const [wikiGroupName, couples] of Object.entries(context.groupMappings.mappings)) {
-    WIKI.logger.verbose(`[ietf-auth] checking if user matches the wiki group "${wikiGroupName}"`);
-    /* Check for any matching rule [ role, group ] -->  wikiGroupName */
-    let matched = false;
-    for (const [mapRole, mapGroup] of couples) {
-      for (const [role, group] of userRoles) {
-        if (mapRole === role && mapGroup === group || mapRole === role && mapGroup === '*' || mapRole === '*' && mapGroup === group || mapRole === '*' && mapGroup === '*') {
-          WIKI.logger.verbose(`[ietf-auth] user "${profile.displayName}" matched rule "[${mapRole}, ${mapGroup}]" --> "${wikiGroupName}"`);
-          /* Add the user to all group ids matching the name wikiGroupName */
-          for (const { id: groupId } of await getGroupsByName(wikiGroupName)) {
-            /* Do not add duplicate group ids */
-            if (userWikiGroups.includes(groupId)) continue;
-            WIKI.logger.info(`[ietf-auth] adding user "${profile.displayName}" to group "${wikiGroupName}" (id=${groupId})`);
-            userWikiGroups.push(groupId);
-          }
-          matched = true;
-          break;
+  for (const [wikiGroupName, tuplesMap] of Object.entries(context.groupMappings.mappings.roles)) {
+    WIKI.logger.verbose(`[ietf-auth] checking if user roles match the wiki group "${wikiGroupName}"`);
+    /* Do not add duplicate group names */
+    if (userWikiGroupNames.has(wikiGroupName)) continue;
+    /* Check for any matching rule [ role, group, ... ] -->  wikiGroupName */
+    for (const tupleMap of tuplesMap) {
+      for (const userRole of userRoles) {
+        if (!_.isEqualWith(tupleMap, userRole, (tupleValue, usrValue) => { if ([usrValue, '*'].includes(tupleValue)) return true; })) continue;
+        WIKI.logger.verbose(`[ietf-auth] user "${profile.displayName}" matched roles rule "${JSON.stringify(tupleMap)}" --> "${wikiGroupName}"`);
+        userWikiGroupNames.add(wikiGroupName);
+        /* Add the user to all group ids matching the name wikiGroupName */
+        for (const { id: groupId } of await getGroupsByName(wikiGroupName)) {
+          WIKI.logger.info(`[ietf-auth] adding user "${profile.displayName}" to group "${wikiGroupName}" (id=${groupId})`);
+          userWikiGroupIds.add(groupId);
         }
+        break;
       }
-      if (matched) break;
+      /* In case of matched rule break the loop */
+      if (userWikiGroupNames.has(wikiGroupName)) break;
     }
   }
 
-  return userWikiGroups;
+  for (const [wikiGroupName, dots] of Object.entries(context.groupMappings.mappings.dots)) {
+    WIKI.logger.verbose(`[ietf-auth] checking if user dots match the wiki group "${wikiGroupName}"`);
+    /* Do not add duplicate group names */
+    if (userWikiGroupNames.has(wikiGroupName)) continue;
+    /* Check for any matching rule [ dot, ... ] -->  wikiGroupName */
+    for (const userDot of userDots) {
+      if (!dots.includes(userDot)) continue;
+      WIKI.logger.verbose(`[ietf-auth] user "${profile.displayName}" matched dots rule "${JSON.stringify(dots)}" --> "${wikiGroupName}"`);
+      userWikiGroupNames.add(wikiGroupName);
+      /* Add the user to all group ids matching the name wikiGroupName */
+      for (const { id: groupId } of await getGroupsByName(wikiGroupName)) {
+        WIKI.logger.info(`[ietf-auth] adding user "${profile.displayName}" to group "${wikiGroupName}" (id=${groupId})`);
+        userWikiGroupIds.add(groupId);
+      }
+      break;
+    }
+  }
+
+  return [...userWikiGroupIds];
 }

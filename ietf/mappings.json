@@ -3,58 +3,68 @@
         "members"
     ],
     "mappings": {
-        "admins": [
-            [
-                "ad",
-                "iesg"
-            ]
-        ],
-        "editors": [
-            [
-                "chair",
-                "*"
+        "roles": {
+            "admins": [
+                [
+                    "ad",
+                    "iesg"
+                ]
             ],
-            [
-                "ad",
-                "iesg"
-            ]
-        ],
-        "iesg": [
-            [
-                "ad",
-                "iesg"
+            "editors": [
+                [
+                    "chair",
+                    "*"
+                ],
+                [
+                    "ad",
+                    "iesg"
+                ]
             ],
-            [
-                "execdir",
-                "ietf"
-            ]
-        ],
-        "ietf-chairs": [
-            [
-                "chair",
-                "ietf"
-            ]
-        ],
-        "nomcom2021": [
-            [
-                "chair",
-                "nomcom2021"
+            "iesg": [
+                [
+                    "ad",
+                    "iesg"
+                ],
+                [
+                    "execdir",
+                    "ietf"
+                ]
             ],
-            [
-                "member",
-                "nomcom2021"
+            "ietf-chairs": [
+                [
+                    "chair",
+                    "ietf"
+                ]
             ],
-            [
-                "liaison",
-                "nomcom2021"
+            "nomcom2021": [
+                [
+                    "chair",
+                    "nomcom2021"
+                ],
+                [
+                    "member",
+                    "nomcom2021"
+                ],
+                [
+                    "liaison",
+                    "nomcom2021"
+                ]
+            ],
+            "nomcom2021-chairs": [
+                [
+                    "chair",
+                    "nomcom2021"
+                ]
+            ],
+            "owners": []
+        },
+        "dots": {
+            "editors": [
+                "ad"
+            ],
+            "ietf-chairs": [
+                "chair"
             ]
-        ],
-        "nomcom2021-chairs": [
-            [
-                "chair",
-                "nomcom2021"
-            ]
-        ],
-        "owners": []
+        }
     }
 }
