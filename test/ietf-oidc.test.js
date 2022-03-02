@@ -35,7 +35,10 @@ describe('JSON importing Test', () => {
   const context = {
     groupMappings: {
       defaults: [],
-      mappings: {},
+      mappings: {
+        roles: {},
+        dots: {},
+      },
     },
     lastModified: -1,
   };
@@ -47,8 +50,11 @@ describe('JSON importing Test', () => {
   it('context should contain defaults', () => {
     expect(_.isEqual(context.groupMappings.defaults, jsonObj.defaults)).to.be.true;
   });
-  it('context should contain mappings', () => {
-    expect(_.isEqual(context.groupMappings.mappings, jsonObj.mappings)).to.be.true;
+  it('context should contain roles mappings', () => {
+    expect(_.isEqual(context.groupMappings.mappings.roles, jsonObj.mappings.roles)).to.be.true;
+  });
+  it('context should contain dots mappings', () => {
+    expect(_.isEqual(context.groupMappings.mappings.dots, jsonObj.mappings.dots)).to.be.true;
   });
   it('context last-modified should be greater than 0', () => {
     expect(context.lastModified).to.be.above(0);
@@ -60,7 +66,10 @@ describe('User role matching Test', () => {
   const context = {
     groupMappings: {
       defaults: [],
-      mappings: {},
+      mappings: {
+        roles: {},
+        dots: {},
+      },
     },
     lastModified: -1,
   };
@@ -69,16 +78,16 @@ describe('User role matching Test', () => {
   const ietfChairProfile = JSON.parse(readFileSync(join(__dirname, 'files/profile-ietf-chair.json')));
   const genericProfile = JSON.parse(readFileSync(join(__dirname, 'files/profile-generic.json')));
 
-  it('User without roles should have only default groups', async () => {
-    const matchedGroups = await authModule.matchUserRoles({ context, profile: noRolesProfile, rolesClaim: 'roles' });
+  it('User without roles and dots should have only default groups', async () => {
+    const matchedGroups = await authModule.matchUserRoles({ context, profile: noRolesProfile, rolesClaim: 'roles', dotsClaim: 'dots' });
     expect(_.isEqual(matchedGroups, [1, 2])).to.be.true;
   });
   it('User with roles matching the wildcards', async () => {
-    const matchedGroups = await authModule.matchUserRoles({ context, profile: ietfChairProfile, rolesClaim: 'roles' });
+    const matchedGroups = await authModule.matchUserRoles({ context, profile: ietfChairProfile, rolesClaim: 'roles', dotsClaim: 'dots' });
     expect(_.isEqual(matchedGroups, [1, 2, 3, 4, 5, 6])).to.be.true;
   });
-  it('User with roles matching generic rules', async () => {
-    const matchedGroups = await authModule.matchUserRoles({ context, profile: genericProfile, rolesClaim: 'roles' });
-    expect(_.isEqual(matchedGroups, [1, 2, 3, 99])).to.be.true;
+  it('User with roles and dots matching generic rules', async () => {
+    const matchedGroups = await authModule.matchUserRoles({ context, profile: genericProfile, rolesClaim: 'roles', dotsClaim: 'dots' });
+    expect(_.isEqual(matchedGroups, [1, 2, 3, 99, 1099])).to.be.true;
   });
 });

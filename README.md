@@ -47,58 +47,88 @@ The format of the file is the following:
 {
     "defaults": ...
     "mappings": {
-        "groupname_1": Array of Arrays,
-        "groupname_2": Array of Arrays,
-        "groupname_3": Array of Arrays,
-        ...
+        "roles": {
+            "groupname_1": Array of Arrays,
+            "groupname_2": Array of Arrays,
+            "groupname_3": Array of Arrays,
+            ...
+        },
+        "dots": {
+            "groupname_4": Array of Strings,
+            ...
+        }
     }
 }
 ```
-Any element of an array `groupname` is a couple `[oidcRole, oidcGroup]` (as returned by the datatracker OIDC user-info API) that will match the `groupname` wiki.js group, e.g.:
+Any element of an array `groupname` in the `roles` section is a tuple `[oidcRole, oidcGroup, ... ]` (as returned by the datatracker OIDC user-info API) that will match the `groupname` wiki.js group, e.g.:
 ```
 ...
 "mappings": {
-    "admins": [
-        [
-            "ad",
-            "iesg"
+    "roles": {
+        "admins": [
+            [
+                "ad",
+                "iesg",
+                ...
+            ],
+            [
+                "chair",
+                "ietf",
+                ...
+            ],
         ],
-        [
-            "chair",
-            "ietf"
+        "iesg": [
+            [
+                "ad",
+                "iesg"m
+                ...
+            ],
+            [
+                "execdir",
+                "ietf",
+                ...
+            ]
         ],
-    ],
-    "iesg": [
-        [
-            "ad",
-            "iesg"
-        ],
-        [
-            "execdir",
-            "ietf"
-        ]
-    ],
+        ...
+    }
     ...
 }
 ```
-By using wildcards `*` you can omit an `oidcRole`, an `oidcGroup` or both, e.g.:
+By using wildcards `*` you can omit any tuple element, e.g.:
 ```
 "mappings": {
-    "chairs": [
-        [
-            "chair",
-            "*"
-        ]
-    ],
-    "iesg-users": [
-        [
-            "*",
-            "iesg"
-        ]
-    ],
+    "roles": {
+        "chairs": [
+            [
+                "chair",
+                "*",
+                ...
+            ]
+        ],
+        "iesg-users": [
+            [
+                "*",
+                "iesg",
+                ...
+            ]
+        ],
+        ...
+    }
     ...
 }
 ```
+Any element of an array `groupname` in the mappings `dots` section is an array of strings `[dot1, dot2, ... ]` (as returned by the datatracker OIDC user-info API) that will match the `groupname` wiki.js group, e.g.:
+```
+"mappings": {
+    ...
+    "dots": {
+        "chairs": [ "llc", ... ],
+        ...
+    }
+    ...
+}
+```
+
 Any change to the mappings file *should* be detected (checking the last-modified timestamp) when the next authentication request comes in.
 
 To manually reload the configuration head to the *Authentication* strategy configuration on the wiki.js web-gui and hit *Apply*.

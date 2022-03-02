@@ -4,40 +4,52 @@
         "users_gid2"
     ],
     "mappings": {
-        "everyone_gid3": [
-            [
-                "*",
-                "*"
-            ]
-        ],
-        "chairs_gid4": [
-            [
-                "chair",
-                "*"
-            ]
-        ],
-        "ietf_gid5": [
-            [
-                "*",
-                "ietf"
-            ]
-        ],
-        "ietf-chairs_gid6": [
-            [
-                "chair",
-                "ietf"
-            ]
-        ],
-        "void_gid98": [],
-        "generic_gid99": [
-            [
-                "role1",
-                "group1"
+        "roles": {
+            "everyone_gid3": [
+                [
+                    "*",
+                    "*"
+                ]
             ],
-            [
-                "role2",
-                "group2"
+            "chairs_gid4": [
+                [
+                    "chair",
+                    "*"
+                ]
+            ],
+            "ietf_gid5": [
+                [
+                    "*",
+                    "ietf"
+                ]
+            ],
+            "ietf-chairs_gid6": [
+                [
+                    "chair",
+                    "ietf"
+                ]
+            ],
+            "void_gid98": [],
+            "generic_gid99": [
+                [
+                    "role1",
+                    "group1"
+                ],
+                [
+                    "role2",
+                    "group2"
+                ]
             ]
-        ]
+        },
+        "dots": {
+            "chairs_gid1001": [
+                "chair"
+            ],
+            "void_gid1098": [],
+            "generic_gid1099": [
+                "dot1",
+                "dot2"
+            ]
+        }
     }
 }

@@ -52,7 +52,7 @@ props:
     type: String
     title: 'Scopes'
     hint: 'User scopes to request'
-    default: 'openid profile email photo roles'
+    default: 'openid profile email photo roles dots'
     order: 8
   emailClaim:
     type: String
@@ -67,3 +67,9 @@ props:
     hint: 'Field containing the roles array'
     default: 'roles'
     order: 10
+  dotsClaim:
+    type: String
+    title: 'Dots Claim'
+    hint: 'Field containing the dots array'
+    default: 'dots'
+    order: 11
