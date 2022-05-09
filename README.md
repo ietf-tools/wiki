@@ -1,6 +1,16 @@
-# wiki.js auth module for the IETF
-This repository contains the code of a wiki.js authentication module that lets the IETF users login through the datatracker OpenID Connect.
+<div align="center">
+    
+<img src="https://raw.githubusercontent.com/ietf-tools/common/main/assets/logos/ietf-wikijs-auth.svg" alt="IETF Wiki.js Auth" height="125" />
+    
+[![License](https://img.shields.io/github/license/ietf-tools/ietf-wikijs-auth)](https://github.com/ietf-tools/ietf-wikijs-auth/blob/main/LICENSE)
 
+##### IETF Authentication Module for Wiki.js
+    
+</div>
+
+---
+
+This repository contains the code of a Wiki.js authentication module that lets the IETF users login through the Datatracker OpenID Connect.
 
 # Setup (Docker)
 1. `docker-compose up`
@@ -27,7 +37,8 @@ The mapping between IETF datatracker roles and wiki.js groups can be specified i
 The format of the file is the following: 
 ```
 {
-    "defaults": Array of Strings, 
+    "defaults": Array of Strings,
+    "groups": Array of Strings,
     "mappings": Object
 }
 ```
@@ -36,6 +47,19 @@ The format of the file is the following:
 ```
 {
     "defaults": ["members", "users"],
+    "groups": [],
+    "mappings": {
+        ...
+    }
+}
+```
+
+`groups` contains the list of the groups that will be automatically created if they don't already exist on initialization:
+
+```
+{
+    "defaults": [],
+    "groups": ["iesg", "ietf-chairs"],
     "mappings": {
         ...
     }
@@ -46,6 +70,7 @@ The format of the file is the following:
 ```
 {
     "defaults": ...
+    "groups": ...
     "mappings": {
         "roles": {
             "groupname_1": Array of Arrays,
