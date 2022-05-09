@@ -9,12 +9,12 @@ const OpenIDConnectStrategy = require('passport-openidconnect').Strategy
 const context = {
   groupMappings: {
     defaults: [],
+    groups: [],
     mappings: {
       roles: {},
       dots: {}
     }
-  },
-  lastModified: -1
+  }
 }
 
 const mappingsFilePath = join(__dirname, 'mappings.json')
@@ -24,8 +24,10 @@ module.exports = {
     WIKI.logger.info(`[ietf-auth] current conf -> ${JSON.stringify(conf)}`)
     const { authorizationURL, callbackURL, clientId: clientID, clientSecret, emailClaim, issuer, rolesClaim, dotsClaim, scope, tokenURL, userInfoURL } = conf
 
-    importJsonMappings({ context, path: mappingsFilePath, force: true })
+    importJsonMappings({ context, path: mappingsFilePath })
     WIKI.logger.info(`[ietf-auth] current mappings -> ${JSON.stringify(context.groupMappings)}`)
+
+    ensureGroupsExist(context.groupMappings.groups)
 
     passport.use(
       'ietf',
@@ -50,7 +52,6 @@ module.exports = {
           })
 
           WIKI.logger.debug(`[ietf-auth] user profile -> ${JSON.stringify(profile)}`)
-          importJsonMappings({ context, path: mappingsFilePath, force: false })
 
           const ietfUserGroups = await matchUserRoles({ context, profile, rolesClaim, dotsClaim })
           await WIKI.models.users.updateUser({
@@ -78,26 +79,10 @@ module.exports = {
   }
 }
 
-/* Helper function to read the last modified timestamp of mappings.json */
-function getLastModified ({ path }) {
-  try {
-    const { mtimeMs } = statSync(path)
-    return mtimeMs
-  } catch ({ message }) {
-    WIKI.logger.error(`[ietf-auth] error getting the mappings file last modified time (${message})`)
-    return -1
-  }
-}
-
 /* Import mapping rules from a file */
 /* If set, force parameter will not control the last-modified time of the file before importing */
-function importJsonMappings ({ context, path, force = true }) {
-  const lms = getLastModified({ path })
+function importJsonMappings ({ context, path }) {
   let newMappings
-  if (!force) {
-    if (lms <= context.lastModified) return
-    WIKI.logger.info('[ietf-auth] mappings json has been modified since the last time!')
-  }
   try {
     newMappings = JSON.parse(readFileSync(path))
   } catch ({ message }) {
@@ -105,14 +90,41 @@ function importJsonMappings ({ context, path, force = true }) {
     return
   }
   context.groupMappings = newMappings
-  context.lastModified = lms
   WIKI.logger.info('[ietf-auth] mappings json imported successfully')
   return newMappings
 }
 
+/* Create groups if they don't exist */
+async function ensureGroupsExist (groups) {
+  WIKI.logger.info('[ietf-auth] Ensuring all groups exist...')
+  const existingGroups = await WIKI.models.groups.query().select('name')
+  const groupsToCreate = groups.filter(g => !existingGroups.some(e => e.name === g))
+  if (groupsToCreate.length > 0) {
+    for (const gr of groupsToCreate) {
+      WIKI.logger.info(`[ietf-auth] Creating new group ${gr}...`)
+      await WIKI.models.groups.query().insert({
+        name: gr,
+        permissions: JSON.stringify(WIKI.data.groups.defaultPermissions),
+        pageRules: JSON.stringify(WIKI.data.groups.defaultPageRules),
+        isSystem: false
+      })
+    }
+    WIKI.logger.info('[ietf-auth] New group(s) created. Reloading groups...')
+    await WIKI.auth.reloadGroups()
+    WIKI.events.outbound.emit('reloadGroups')
+  } else {
+    WIKI.logger.info('[ietf-auth] No new group to create.')
+  }
+}
+
 /* Return an array of wiki groups matching the given name */
-async function getGroupsByName (name) {
-  const wikiGroups = await WIKI.models.groups.query().where('name', '=', name)
+function getGroupsByName (name) {
+  const wikiGroups = []
+  for (const gr in WIKI.auth.groups) {
+    if (WIKI.auth.groups[gr].name === name) {
+      wikiGroups.push(WIKI.auth.groups[gr].id)
+    }
+  }
   return wikiGroups
 }
 
@@ -137,7 +149,7 @@ async function matchUserRoles ({ context, profile, rolesClaim, dotsClaim }) {
     if (userWikiGroupNames.has(wikiGroupName)) continue
     userWikiGroupNames.add(wikiGroupName)
     /* Add the user to all group ids matching the name wikiGroupName */
-    for (const { id: groupId } of await getGroupsByName(wikiGroupName)) {
+    for (const groupId of getGroupsByName(wikiGroupName)) {
       WIKI.logger.info(`[ietf-auth] adding user "${profile.displayName}" to default group "${wikiGroupName}" (id=${groupId})`)
       userWikiGroupIds.add(groupId)
     }
@@ -155,7 +167,7 @@ async function matchUserRoles ({ context, profile, rolesClaim, dotsClaim }) {
         WIKI.logger.verbose(`[ietf-auth] user "${profile.displayName}" matched roles rule "${JSON.stringify(tupleMap)}" --> "${wikiGroupName}"`)
         userWikiGroupNames.add(wikiGroupName)
         /* Add the user to all group ids matching the name wikiGroupName */
-        for (const { id: groupId } of await getGroupsByName(wikiGroupName)) {
+        for (const groupId of getGroupsByName(wikiGroupName)) {
           WIKI.logger.info(`[ietf-auth] adding user "${profile.displayName}" to group "${wikiGroupName}" (id=${groupId})`)
           userWikiGroupIds.add(groupId)
         }
@@ -176,7 +188,7 @@ async function matchUserRoles ({ context, profile, rolesClaim, dotsClaim }) {
       WIKI.logger.verbose(`[ietf-auth] user "${profile.displayName}" matched dots rule "${JSON.stringify(dots)}" --> "${wikiGroupName}"`)
       userWikiGroupNames.add(wikiGroupName)
       /* Add the user to all group ids matching the name wikiGroupName */
-      for (const { id: groupId } of await getGroupsByName(wikiGroupName)) {
+      for (const groupId of getGroupsByName(wikiGroupName)) {
         WIKI.logger.info(`[ietf-auth] adding user "${profile.displayName}" to group "${wikiGroupName}" (id=${groupId})`)
         userWikiGroupIds.add(groupId)
       }

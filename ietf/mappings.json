@@ -2,6 +2,16 @@
     "defaults": [
         "members"
     ],
+    "groups": [
+      "admins",
+      "editors",
+      "iesg",
+      "ietf-chairs",
+      "members",
+      "nomcom2021-chairs",
+      "nomcom2021",
+      "owners"
+    ],
     "mappings": {
         "roles": {
             "admins": [
