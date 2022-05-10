@@ -12,27 +12,50 @@
 
 This repository contains the code of a Wiki.js authentication module that lets the IETF users login through the Datatracker OpenID Connect.
 
-# Setup (Docker)
+- [Production Usage](#production-usage)
+  - [Initial Setup](#initial-setup)
+  - [Non-Docker Usage](#non-docker-usage)
+- [Docker Dev Environment](#docker-dev-environment)
+- [Mappings](#mappings)
+- [Running Tests](#running-tests)
+- [Releasing a New Build)(#releasing-a-new-build)
+
+### Production Usage
+
+Use the following docker image which contains the IETF Datatracker authentication module:
+```
+ghcr.io/ietf-tools/wiki:latest
+```
+
+#### Initial Setup
+
+1. Head to Wiki.js **Administration Area** and validate that all groups specified in `mappings.json` have been added under **Groups**. Missing groups are automatically created during initialization.
+2. Still under **Groups**, add the necessary page rules / permissions for all groups.
+
+    > ***Note that groups must NOT be renamed. They must match exactly as they are in `mappings.json`.***
+3. Under **Authentication** settings add the strategy **IETF datatracker OpenID Connect**
+    * Enable *Allow self-registration*
+    * Complete the configuration with the IETF provider settings
+    * Ensure that the machine is reachable to the strategy *callback URL*
+
+#### Non-Docker Usage
+
+Copy the whole `ietf` folder under the path `server/modules/authentication/` of your wiki.js instance.
+
+### Docker Dev Environment
+
 1. `docker-compose up`
-2. complete the initial setup of wiki.js by connecting to `http://HOST:PORT` (default `PORT` is 1926)
-3. create a homepage
-4. head to wiki.js **Administration** settings and add the groups specified in `mappings.json`
-5. create the group rules if you need to enforce the permission system
-6. in **Authentication** settings add the strategy **IETF datatracker OpenID Connect**
-    * enable *Allow self-registration*
-    * complete the configuration with the IETF provider settings
-    * ensure that the machine is reachable to the strategy *callback URL*
+2. Complete the initial setup of wiki.js by connecting to `http://HOST:PORT` (default `PORT` is 1926)
+3. Create a homepage
+4. Head to wiki.js **Administration** settings and add the groups specified in `mappings.json`
+5. Create the group rules if you need to enforce the permission system
+6. Under **Authentication**, add the strategy **IETF datatracker OpenID Connect**
+    * Enable *Allow self-registration*
+    * Complete the configuration with the IETF provider settings
+    * Ensure that the machine is reachable to the strategy *callback URL*
 
-# Setup (existing wiki.js instance)
-1. copy the whole `ietf` folder under the path `server/modules/authentication/` of your wiki.js
-2. head to wiki.js **Administration** settings and add the groups specified in `mappings.json`
-3. create the group rules if you need to enforce the permission system
-4. in **Authentication** settings add the strategy **IETF datatracker OpenID Connect**
-    * enable *Allow self-registration*
-    * complete the configuration with the IETF provider settings
-    * ensure that the machine is reachable to the strategy *callback URL*
+### Mappings
 
-# Mapping datatracker roles to wiki.js groups
 The mapping between IETF datatracker roles and wiki.js groups can be specified in the `mappings.json` file.
 The format of the file is the following: 
 ```
@@ -158,9 +181,13 @@ Any change to the mappings file *should* be detected (checking the last-modified
 
 To manually reload the configuration head to the *Authentication* strategy configuration on the wiki.js web-gui and hit *Apply*.
 
-# Running tests
-```
+### Running tests
+
+```sh
 npm install
 npm run test
-
 ```
+
+### Releasing a New Build
+
+To release a new docker image, go to the **Actions** tab, select the **Build and Release** workflow and click **Run workflow**.
