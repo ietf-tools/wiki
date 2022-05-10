@@ -177,9 +177,7 @@ Any element of an array `groupname` in the mappings `dots` section is an array o
 }
 ```
 
-Any change to the mappings file *should* be detected (checking the last-modified timestamp) when the next authentication request comes in.
-
-To manually reload the configuration head to the *Authentication* strategy configuration on the wiki.js web-gui and hit *Apply*.
+Any change to the mappings file requires a restart of the container while in dev mode.
 
 ### Running tests
 
