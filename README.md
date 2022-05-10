@@ -18,7 +18,7 @@ This repository contains the code of a Wiki.js authentication module that lets t
 - [Docker Dev Environment](#docker-dev-environment)
 - [Mappings](#mappings)
 - [Running Tests](#running-tests)
-- [Releasing a New Build)(#releasing-a-new-build)
+- [Releasing a New Build](#releasing-a-new-build)
 
 ### Production Usage
 
