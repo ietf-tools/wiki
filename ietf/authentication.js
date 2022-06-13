@@ -30,7 +30,7 @@ module.exports = {
     ensureGroupsExist(context.groupMappings.groups)
 
     passport.use(
-      'ietf',
+      conf.key,
       new OpenIDConnectStrategy({
         authorizationURL,
         callbackURL,
