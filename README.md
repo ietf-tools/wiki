@@ -20,6 +20,9 @@ This repository contains the code of a Wiki.js authentication module that lets t
 - [Running Tests](#running-tests)
 - [Releasing a New Build](#releasing-a-new-build)
 
+> **Note**  
+> The `mappings.json` provided in this repository is only an example and should be modified to match the target instance use case.
+
 ### Production Usage
 
 Use the following docker image which contains the IETF Datatracker authentication module:
