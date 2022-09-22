@@ -10,25 +10,55 @@
 
 ---
 
-This repository contains the code of a Wiki.js authentication module that lets the IETF users login through the Datatracker OpenID Connect.
+This repository contains the custom IETF modules for Wiki.js, packaged into a docker container image.
 
-- [Production Usage](#production-usage)
-  - [Initial Setup](#initial-setup)
-  - [Non-Docker Usage](#non-docker-usage)
+- [Deployment](#deployment)
+- [Modules](#modules)
+  - [Authentication - IETF Datatracker](#authentication---ietf-datatracker)
+    - [Initial Setup](#initial-setup)
+    - [Mappings](#mappings)
+  - [Rendering - IETF Custom](#rendering---ietf-custom)
 - [Docker Dev Environment](#docker-dev-environment)
-- [Mappings](#mappings)
 - [Running Tests](#running-tests)
 - [Releasing a New Build](#releasing-a-new-build)
 
 > **Note**  
 > The `mappings.json` provided in this repository is only an example and should be modified to match the target instance use case.
 
-### Production Usage
+## Deployment
 
-Use the following docker image which contains the IETF Datatracker authentication module:
+### Only once per server:
+
+Create a Docker network named `wikinet` so that all Wiki.js instances can communicate with the Wiki.js Update Companion:
+
+```bash
+docker network create wikinet
 ```
-ghcr.io/ietf-tools/wiki:latest
+
+### For each Wiki.js instance:
+    
+1. Create a container, replacing the following `xyz123` values in the command below:
+
+- `--name=xyz123` -> Name of the instance, should be unique for each container, e.g. `--name=wiki-ietf`
+- `-e DB_HOST=xyz123` -> Hostname / IP of the PostgreSQL database server.
+- `-e DB_PORT=5432` -> Port of the PostgreSQL database server.
+- `-e DB_USER=xyz123` -> Username to connect to the PostgreSQL database server.
+- `-e DB_PASS=xyz123` -> Password to connect to the PostgreSQL database server.
+- `-e DB_NAME=wiki` -> Database name on the PostgreSQL server.
+- `-h xyz123` -> Hostname of the container instance. Should be identical to the container name entered above (e.g. `-h wiki-ietf`).
+- `-p 80:3000` -> Change `80` to the desired port to expose. The port should be unique for each container. Do not change the `3000` value, this is the internal container port!
+
+```bash
+docker create --name=xyz123 -e DB_HOST=xyz123 -e DB_PORT=5432 -e DB_PASS=xyz123 -e DB_USER=xyz123 -e DB_NAME=wiki -h xyz123 -p 80:3000  --restart=unless-stopped --network=wikinet ghcr.io/ietf-tools/wiki:latest
 ```
+
+2. Add the proper mappings to your reverse-proxy software (e.g. nginx / apache) to point each domain to the correct port you exposed above.
+
+3. If this is a new Wiki.js instance, complete the setup by loading the domain name in your browser.
+
+## Modules
+
+### Authentication - IETF Datatracker
 
 #### Initial Setup
 
@@ -45,19 +75,7 @@ ghcr.io/ietf-tools/wiki:latest
 
 Copy the whole `ietf` folder under the path `server/modules/authentication/` of your wiki.js instance.
 
-### Docker Dev Environment
-
-1. `docker-compose up`
-2. Complete the initial setup of wiki.js by connecting to `http://HOST:PORT` (default `PORT` is 1926)
-3. Create a homepage
-4. Head to wiki.js **Administration** settings and add the groups specified in `mappings.json`
-5. Create the group rules if you need to enforce the permission system
-6. Under **Authentication**, add the strategy **IETF datatracker OpenID Connect**
-    * Enable *Allow self-registration*
-    * Complete the configuration with the IETF provider settings
-    * Ensure that the machine is reachable to the strategy *callback URL*
-
-### Mappings
+#### Mappings
 
 The mapping between IETF datatracker roles and wiki.js groups can be specified in the `mappings.json` file.
 The format of the file is the following: 
@@ -182,13 +200,31 @@ Any element of an array `groupname` in the mappings `dots` section is an array o
 
 Any change to the mappings file requires a restart of the container while in dev mode.
 
-### Running tests
+### Rendering - IETF Custom
+
+This rendering module ensures that any references to RFC's or Internet Drafts are automatically linked to their corresponding Datatracker page.
+
+This module should be enabled by default under the Administration Area > Rendering > HTML
+
+## Docker Dev Environment
+
+1. `docker-compose up`
+2. Complete the initial setup of wiki.js by connecting to `http://HOST:PORT` (default `PORT` is 1926)
+3. Create a homepage
+4. Head to wiki.js **Administration** settings and add the groups specified in `mappings.json`
+5. Create the group rules if you need to enforce the permission system
+6. Under **Authentication**, add the strategy **IETF datatracker OpenID Connect**
+    * Enable *Allow self-registration*
+    * Complete the configuration with the IETF provider settings
+    * Ensure that the machine is reachable to the strategy *callback URL*
+
+## Running tests
 
 ```sh
 npm install
 npm run test
 ```
 
-### Releasing a New Build
+## Releasing a New Build
 
 To release a new docker image, go to the **Actions** tab, select the **Build and Release** workflow and click **Run workflow**.
