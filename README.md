@@ -1,10 +1,10 @@
 <div align="center">
     
-<img src="https://raw.githubusercontent.com/ietf-tools/common/main/assets/logos/ietf-wikijs-auth.svg" alt="IETF Wiki.js Auth" height="125" />
+<img src="https://raw.githubusercontent.com/ietf-tools/common/main/assets/logos/ietf-wikijs.svg" alt="IETF Wiki.js" height="125" />
     
 [![License](https://img.shields.io/github/license/ietf-tools/ietf-wikijs-auth)](https://github.com/ietf-tools/ietf-wikijs-auth/blob/main/LICENSE)
 
-##### IETF Authentication Module for Wiki.js
+##### Custom Wiki.js image for IETF wikis
     
 </div>
 
