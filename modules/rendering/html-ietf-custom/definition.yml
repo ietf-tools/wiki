@@ -1,0 +1,8 @@
+key: htmlIETFCustom
+title: IETF Custom HTML
+description: Creates external links for RFC and ID mentions
+author: IETF
+icon: mdi-launch
+enabledDefault: true
+dependsOn: htmlCore
+props: {}

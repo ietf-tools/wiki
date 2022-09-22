@@ -1,0 +1,41 @@
+HTML-IETF-CUSTOM
+Version: 1.0.2
+Created: July 2, 2021
+Updated: November 15, 2021
+
+- Description: -----------------------------------------------------------------
+This is a custom rendering plugin created for the IETF wiki.js instance(s). The
+intent is that any references to RFC's or Internet Drafts are automatically
+linked to their corresponding Datatracker page.
+
+For example, if a user were to type `rfc 64` during the page creation or
+modification phase on any wiki page, when the page is rendered an <a href/> tag
+is added around that text with a link to https://datatracker.ietf.org/doc/rfc64/
+
+Similarly, were a user to reference a draft like `draft-ietf-taps-impl-05`, the
+page would be rendered with an <a href/> tag around that text with a link to
+https://datatracker.ietf.org/doc/draft-ietf-taps-impl/05/
+
+There are several times we intentionally do not add a link:
+- Inside of a link (<a href> tag)
+- Inside of a header tag (<h[1-9])
+- Inside of any code blocks (<code>)
+
+- Installation: ----------------------------------------------------------------
+To install, copy the folder html-ietf-custom/ and its contents to any running
+wiki.js installation at your-wiki-path/server/modules/rendering/
+
+*Please note that the name of the folder cannot change without also changing
+the name of the module. Changing one or the other without care will break your
+wiki.js instance.
+
+After confirming the files have been copied, all that is needed is to restart
+wiki.js (systemctl restart wiki) and the module is enabled by default.
+
+- Testing: ---------------------------------------------------------------------
+Prerequisites
+	Need to install jest: `npm i -g jest`
+
+You can run all tests for the wiki.js project by running `jest` from any of the
+directories in this project, or you can run `jest IETF` to run just the tests
+specific to this module.
