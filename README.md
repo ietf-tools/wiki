@@ -22,9 +22,6 @@ This repository contains the custom IETF modules for Wiki.js, packaged into a do
 - [Running Tests](#running-tests)
 - [Releasing a New Build](#releasing-a-new-build)
 
-> **Note**  
-> The `mappings.json` provided in this repository is only an example and should be modified to match the target instance use case.
-
 ## Deployment
 
 ### Only once per server:
@@ -59,6 +56,9 @@ docker create --name=xyz123 -e DB_HOST=xyz123 -e DB_PORT=5432 -e DB_PASS=xyz123 
 ## Modules
 
 ### Authentication - IETF Datatracker
+
+> **Note**  
+> The `mappings.json` provided in this repository is only an example and should be modified to match the target instance use case.
 
 #### Initial Setup
 
