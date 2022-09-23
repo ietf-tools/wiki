@@ -24,15 +24,7 @@ This repository contains the custom IETF modules for Wiki.js, packaged into a do
 
 ## Deployment
 
-### Only once per server:
-
-Create a Docker network named `wikinet` so that all Wiki.js instances can communicate with the Wiki.js Update Companion:
-
-```bash
-docker network create wikinet
-```
-
-### For each Wiki.js instance:
+For each Wiki.js instance:
     
 1. Create a container, replacing the following `xyz123` values in the command below:
 
@@ -47,12 +39,19 @@ docker network create wikinet
 - `-v /xyz123/mappings.json:...` -> Path on the server (host) to the mappings.json file. This file will be mounted into the container.
 
 ```bash
-docker create --name=xyz123 -e DB_HOST=xyz123 -e DB_PORT=5432 -e DB_PASS=xyz123 -e DB_USER=xyz123 -e DB_NAME=wiki -h xyz123 -p 80:3000 -v /xyz123/mappings.json:/wiki/server/modules/authentication/ietf/mappings.json:ro --restart=unless-stopped --network=wikinet ghcr.io/ietf-tools/wiki:latest
+docker run --name=xyz123 -e DB_HOST=xyz123 -e DB_PORT=5432 -e DB_PASS=xyz123 -e DB_USER=xyz123 -e DB_NAME=wiki -h xyz123 -p 80:3000 -v /xyz123/mappings.json:/wiki/server/modules/authentication/ietf/mappings.json:ro --restart=unless-stopped -d ghcr.io/ietf-tools/wiki:latest
 ```
 
-2. Add the proper config to your reverse-proxy software (e.g. nginx / apache) to point each domain to the correct port you exposed above.
+2. Ensure the container started correctly by running (replacing `xyz123` with the name of the container):
+```bash
+docker logs xyz123 -f
+```
 
-3. If this is a new Wiki.js instance, complete the setup by loading the domain name in your browser.
+The output should include the line `HTTP Server: [ RUNNING ]`
+
+3. Add the proper config to your reverse-proxy software (e.g. nginx / apache) to point each domain to the correct port you exposed above.
+
+4. If this is a new Wiki.js instance, complete the setup by loading the domain name in your browser.
 
 ## Modules
 
