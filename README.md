@@ -29,7 +29,7 @@ For each Wiki.js instance:
 1. Create a container, replacing the following `xyz123` values in the command below:
 
 - `--name=xyz123` -> Name of the instance, should be unique for each container, e.g. `--name=wiki-ietf`
-- `-e DB_HOST=xyz123` -> Hostname / IP of the PostgreSQL database server.
+- `-e DB_HOST=xyz123` -> Hostname / IP of the PostgreSQL database server. (if database is on the host, see [Database on Localhost](#database-on-localhost) below.)
 - `-e DB_PORT=5432` -> Port of the PostgreSQL database server.
 - `-e DB_USER=xyz123` -> Username to connect to the PostgreSQL database server.
 - `-e DB_PASS=xyz123` -> Password to connect to the PostgreSQL database server.
@@ -52,6 +52,16 @@ The output should include the line `HTTP Server: [ RUNNING ]`
 3. Add the proper config to your reverse-proxy software (e.g. nginx / apache) to point each domain to the correct port you exposed above.
 
 4. If this is a new Wiki.js instance, complete the setup by loading the domain name in your browser.
+
+### Database on localhost
+
+Note that you cannot use `localhost` or `127.0.0.1` as the DB host to communicate to a PostgreSQL server installed on the host itself, as localhost refers to the container, not the host. You must instead add the following to the docker run command *(note that there's nothing to replace in the command below, `host-gateway` is a special docker keyword!)*:
+
+```bash
+--add-host=host.docker.internal:host-gateway
+```
+
+This will add a DNS entry in the container that automatically points to the Docker host IP address. You can then specify `host.docker.internal` as the host for the `DB_HOST` parameter.
 
 ## Modules
 
