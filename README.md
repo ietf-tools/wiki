@@ -29,7 +29,7 @@ For each Wiki.js instance:
 1. Create a container, replacing the following `xyz123` values in the command below:
 
 ```bash
-docker run --name=xyz123 -e DB_HOST=xyz123 -e DB_PORT=5432 -e DB_PASS=xyz123 -e DB_USER=xyz123 -e DB_NAME=wiki -h xyz123 -p 80:3000 -v /xyz123/mappings.json:/wiki/server/modules/authentication/ietf/mappings.json:ro --restart=unless-stopped -d ghcr.io/ietf-tools/wiki:latest
+docker run -d --name=xyz123 -e DB_HOST=xyz123 -e DB_PORT=5432 -e DB_PASS=xyz123 -e DB_USER=xyz123 -e DB_NAME=wiki -h xyz123 -p 80:3000 -v /xyz123/mappings.json:/wiki/server/modules/authentication/ietf/mappings.json:ro --restart=unless-stopped ghcr.io/ietf-tools/wiki:latest
 ```
 
 - `--name=xyz123` -> Name of the instance, should be unique for each container, e.g. `--name=wiki-ietf`
