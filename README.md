@@ -55,7 +55,7 @@ The output should include the line `HTTP Server: [ RUNNING ]`
 
 ### Database on localhost
 
-Note that you cannot use `localhost` or `127.0.0.1` as the DB host to communicate to a PostgreSQL server installed on the host itself, as localhost refers to the container, not the host. You must instead add the following to the docker run command *(note that there's nothing to replace in the command below, `host-gateway` is a special docker keyword!)*:
+Note that you cannot use `localhost` or `127.0.0.1` as the `DB_HOST` value to communicate to a PostgreSQL server installed on the host itself, as localhost refers to the container itself, not the host. You must instead add the following to the docker run command *(note that there's nothing to replace in the command below, `host-gateway` is a special docker keyword!)*:
 
 ```bash
 --add-host=host.docker.internal:host-gateway
