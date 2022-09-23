@@ -44,9 +44,10 @@ docker network create wikinet
 - `-e DB_NAME=wiki` -> Database name on the PostgreSQL server.
 - `-h xyz123` -> Hostname of the container instance. Should be identical to the container name entered above (e.g. `-h wiki-ietf`).
 - `-p 80:3000` -> Change `80` to the desired port to expose. The port should be unique for each container. Do not change the `3000` value, this is the internal container port!
+- `-v /xyz123/mappings.json` -> Path on the server (host) to the mappings.json file.
 
 ```bash
-docker create --name=xyz123 -e DB_HOST=xyz123 -e DB_PORT=5432 -e DB_PASS=xyz123 -e DB_USER=xyz123 -e DB_NAME=wiki -h xyz123 -p 80:3000  --restart=unless-stopped --network=wikinet ghcr.io/ietf-tools/wiki:latest
+docker create --name=xyz123 -e DB_HOST=xyz123 -e DB_PORT=5432 -e DB_PASS=xyz123 -e DB_USER=xyz123 -e DB_NAME=wiki -h xyz123 -p 80:3000 -v /xyz123/mappings.json:/wiki/server/modules/authentication/ietf/mappings.json:ro --restart=unless-stopped --network=wikinet ghcr.io/ietf-tools/wiki:latest
 ```
 
 2. Add the proper mappings to your reverse-proxy software (e.g. nginx / apache) to point each domain to the correct port you exposed above.
