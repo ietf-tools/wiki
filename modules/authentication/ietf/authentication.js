@@ -41,7 +41,7 @@ module.exports = {
         scope,
         tokenURL,
         userInfoURL
-      }, async (req, iss, uiProfile, idProfile, context, idToken, accessToken, refreshToken, params, cb) => {
+      }, async (req, iss, uiProfile, idProfile, ctx, idToken, accessToken, refreshToken, params, cb) => {
         const profile = Object.assign({}, idProfile, uiProfile)
         
         try {
