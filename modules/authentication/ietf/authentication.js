@@ -41,7 +41,9 @@ module.exports = {
         scope,
         tokenURL,
         userInfoURL
-      }, async (req, _iss, _sub, profile, cb) => {
+      }, async (req, iss, uiProfile, idProfile, context, idToken, accessToken, refreshToken, params, cb) => {
+        const profile = Object.assign({}, idProfile, uiProfile)
+        
         try {
           const user = await WIKI.models.users.processProfile({
             providerKey: req.params.strategy,
