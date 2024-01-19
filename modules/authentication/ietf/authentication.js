@@ -17,15 +17,20 @@ const context = {
   }
 }
 
-const mappingsFilePath = join(__dirname, 'mappings.json')
+// const mappingsFilePath = join(__dirname, 'mappings.json')
 
 module.exports = {
   init (passport, conf) {
     WIKI.logger.info(`[ietf-auth] current conf -> ${JSON.stringify(conf)}`)
     const { authorizationURL, callbackURL, clientId: clientID, clientSecret, emailClaim, issuer, rolesClaim, dotsClaim, scope, tokenURL, userInfoURL } = conf
 
-    importJsonMappings({ context, path: mappingsFilePath })
+    importJsonMappings({ context, mappings: conf.mappings /* path: mappingsFilePath */ })
     WIKI.logger.info(`[ietf-auth] current mappings -> ${JSON.stringify(context.groupMappings)}`)
+
+    if (!context.groupMappings.groups) {
+      WIKI.logger.warn(`[ietf-auth] missing or invalid mappings JSON configuration. Aborting initialization.`)
+      return
+    }
 
     ensureGroupsExist(context.groupMappings.groups)
 
@@ -83,10 +88,11 @@ module.exports = {
 
 /* Import mapping rules from a file */
 /* If set, force parameter will not control the last-modified time of the file before importing */
-function importJsonMappings ({ context, path }) {
+function importJsonMappings ({ context, mappings /* path */ }) {
   let newMappings
   try {
-    newMappings = JSON.parse(readFileSync(path))
+    newMappings = JSON.parse(mappings)
+    // newMappings = JSON.parse(readFileSync(path))
   } catch ({ message }) {
     WIKI.logger.error(`[ietf-auth] error importing mappings json (${message})`)
     return

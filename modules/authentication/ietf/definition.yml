@@ -73,3 +73,10 @@ props:
     hint: 'Field containing the dots array'
     default: 'dots'
     order: 11
+  mappings:
+    type: String
+    title: 'Mappings (JSON)'
+    hint: 'JSON object of the groups mappings'
+    multiline: true
+    default: '{}'
+    order: 12
