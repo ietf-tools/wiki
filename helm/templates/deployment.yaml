@@ -37,7 +37,9 @@ spec:
               value: {{ default "1" .Values.postgres.NODE_TLS_REJECT_UNAUTHORIZED | quote }}
             - name: HA_ACTIVE
               value: {{ .Values.replicaCount | int | le 2 | quote }}
+            {{- if Values.env }}
             {{- toYaml .Values.env | nindent 12 }}
+            {{- end }}
     {{- with .Values.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
@@ -70,3 +72,4 @@ spec:
       volumes:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+
