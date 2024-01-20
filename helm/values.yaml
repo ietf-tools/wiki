@@ -116,10 +116,3 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-
-## External PostgreSQL Database settings
-postgres:
-  # note: ?sslmode=require => ?ssl=true
-  databaseURL: postgresql://user:pass@example.com:5432/wiki?ssl=true
-  # For self signed CAs, like DigitalOcean
-  # NODE_TLS_REJECT_UNAUTHORIZED: "0"

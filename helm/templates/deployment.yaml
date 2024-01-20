@@ -31,10 +31,6 @@ spec:
           env:
             - name: DB_TYPE
               value: postgres
-            - name: DATABASE_URL
-              value: {{ .Values.postgres.databaseURL }}
-            - name: NODE_TLS_REJECT_UNAUTHORIZED
-              value: {{ default "1" .Values.postgres.NODE_TLS_REJECT_UNAUTHORIZED | quote }}
             - name: HA_ACTIVE
               value: {{ .Values.replicaCount | int | le 2 | quote }}
             {{- if .Values.env }}
