@@ -27,7 +27,9 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Docker Build & Push Action
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
+      env:
+        DOCKER_BUILD_SUMMARY: false
       with:
         context: .
         file: docker/Dockerfile
@@ -36,14 +38,3 @@ jobs:
         tags: |
           ghcr.io/ietf-tools/wiki:2.0.${{ github.run_number }}
           ghcr.io/ietf-tools/wiki:latest
-
-    - name: Package and Push Chart
-      env:
-        VERSION: 2.0.${{ github.run_number }}
-      run: |
-        echo "Setting version ${{ env.VERSION }}..."
-        sed -i -r -e "s|^version: .*$|version: '${{ env.VERSION }}'|" -e "s|^appVersion: .*$|appVersion: '${{ env.VERSION }}'|" helm/Chart.yaml
-        helm plugin install https://github.com/chartmuseum/helm-push.git
-        helm repo add chartmuseum https://charts.ietf.org
-        helm cm-push --version="${{ env.VERSION }}" --username="${{ secrets.HELM_REPO_USERNAME }}" --password="${{ secrets.HELM_REPO_PASSWORD }}" helm/ chartmuseum
-        helm repo remove chartmuseum
