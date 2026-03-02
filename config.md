@@ -1,4 +1,4 @@
-logLevel: verbose
+kongLevel: verbose
 port: 3000
 bindIP: 0.0.0.0
 db:
